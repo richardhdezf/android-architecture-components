@@ -20,12 +20,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.archcomp.data.Favorite
 import com.example.archcomp.data.Product
 
-@Database(entities = [Product::class], version = 1, exportSchema = false)
+@Database(entities = [Product::class, Favorite::class], version = 1, exportSchema = false)
 abstract class ApplicationDatabase : RoomDatabase() {
 
     abstract fun productsDao(): ProductsDao
+    abstract fun favoritesDao(): FavoritesDao
 
     companion object {
         @Volatile

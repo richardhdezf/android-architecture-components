@@ -21,15 +21,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.archcomp.data.Product
-import com.example.archcomp.databinding.ProductListTileBinding
+import com.example.archcomp.data.Favorite
+import com.example.archcomp.databinding.FavoriteListTileBinding
 
-class ProductListAdapter :
-    ListAdapter<Product, ProductListAdapter.ProductViewHolder>(PRODUCT_COMPARATOR) {
+class FavoritesAdapter(private val itemListener: FavoriteListener) :
+    ListAdapter<Favorite, FavoritesAdapter.FavoriteViewHolder>(FAVORITE_COMPARATOR) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
-        return ProductViewHolder(
-            ProductListTileBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteViewHolder {
+        return FavoriteViewHolder(
+            FavoriteListTileBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -37,32 +37,35 @@ class ProductListAdapter :
         )
     }
 
-    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bind(getItem(position))
+    override fun onBindViewHolder(holder: FavoriteViewHolder, position: Int) {
+        holder.bind(getItem(position), itemListener)
     }
 
-    class ProductViewHolder(
-        private val binding: ProductListTileBinding
+    class FavoriteViewHolder(
+        private val binding: FavoriteListTileBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Product) {
+        fun bind(item: Favorite, listener: FavoriteListener) {
             binding.apply {
                 this.item = item
+            }
+            itemView.setOnClickListener {
+                listener.onDelete(item)
             }
         }
     }
 
     companion object {
-        private val PRODUCT_COMPARATOR = object : DiffUtil.ItemCallback<Product>() {
+        private val FAVORITE_COMPARATOR = object : DiffUtil.ItemCallback<Favorite>() {
             override fun areItemsTheSame(
-                oldItem: Product,
-                newItem: Product
+                oldItem: Favorite,
+                newItem: Favorite
             ): Boolean {
                 return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
-                oldItem: Product,
-                newItem: Product
+                oldItem: Favorite,
+                newItem: Favorite
             ): Boolean {
                 return oldItem.id == newItem.id
             }

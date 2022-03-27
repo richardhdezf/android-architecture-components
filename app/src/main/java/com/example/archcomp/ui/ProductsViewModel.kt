@@ -1,11 +1,16 @@
 package com.example.archcomp.ui
 
 import androidx.lifecycle.*
+import com.example.archcomp.data.Favorite
+import com.example.archcomp.data.FavoritesRepository
 import com.example.archcomp.data.Product
 import com.example.archcomp.data.ProductsRepository
 import kotlinx.coroutines.launch
 
-class ProductsViewModel(private val productsRepository: ProductsRepository) : ViewModel() {
+class ProductsViewModel(
+    private val productsRepository: ProductsRepository,
+    private val favoritesRepository: FavoritesRepository
+) : ViewModel() {
     init {
         viewModelScope.launch {
             try {
@@ -16,16 +21,31 @@ class ProductsViewModel(private val productsRepository: ProductsRepository) : Vi
         }
     }
 
+    fun insertFavorite(item: Product) {
+        viewModelScope.launch {
+            val favorite = Favorite(item.image, item.price, item.id, item.title, item.category)
+            favoritesRepository.insert(favorite)
+        }
+    }
+
+    fun deleteFavorite(item: Favorite) {
+        viewModelScope.launch {
+            favoritesRepository.delete(item)
+        }
+    }
+
     fun getAll(): LiveData<List<Product>> = productsRepository.getAll()
+    fun getAllFavorites(): LiveData<List<Favorite>> = favoritesRepository.getAll()
 }
 
 class ProductsViewModelFactory(
-    private val repository: ProductsRepository
+    private val productsRepository: ProductsRepository,
+    private val favoritesRepository: FavoritesRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProductsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ProductsViewModel(repository) as T
+            return ProductsViewModel(productsRepository, favoritesRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
