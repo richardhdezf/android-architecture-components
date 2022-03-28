@@ -1,11 +1,14 @@
 package com.example.archcomp.ui
 
 import androidx.lifecycle.*
+import androidx.paging.*
 import com.example.archcomp.data.Favorite
 import com.example.archcomp.data.FavoritesRepository
 import com.example.archcomp.data.Product
 import com.example.archcomp.data.ProductsRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class ProductsViewModel(
     private val productsRepository: ProductsRepository,
@@ -35,7 +38,21 @@ class ProductsViewModel(
     }
 
     fun getAll(): LiveData<List<Product>> = productsRepository.getAll()
-    fun getAllFavorites(): LiveData<List<Favorite>> = favoritesRepository.getAll()
+
+    fun getAllFavorites(): Flow<PagingData<Favorite>> = Pager(
+        config = PagingConfig(
+            pageSize = 20,
+            enablePlaceholders = true,
+            maxSize = 100
+        )
+    ) {
+        favoritesRepository.getAll()
+    }.flow
+        .map { pagingData ->
+            pagingData
+                .filter { favorite -> favorite.price >= 20 }
+        }
+        .cachedIn(viewModelScope)
 }
 
 class ProductsViewModelFactory(

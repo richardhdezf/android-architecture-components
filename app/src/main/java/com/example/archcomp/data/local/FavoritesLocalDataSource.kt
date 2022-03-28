@@ -15,14 +15,13 @@
  */
 package com.example.archcomp.data.local
 
-import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import com.example.archcomp.data.Favorite
-import com.example.archcomp.data.Product
 
 class FavoritesLocalDataSource(private val favoritesDao: FavoritesDao) {
     suspend fun insert(item: Favorite) = favoritesDao.insert(item)
 
     suspend fun delete(item: Favorite) = favoritesDao.delete(item)
 
-    fun getAll(): LiveData<List<Favorite>> = favoritesDao.getAll()
+    fun getAll(): PagingSource<Int, Favorite> = favoritesDao.getAll()
 }

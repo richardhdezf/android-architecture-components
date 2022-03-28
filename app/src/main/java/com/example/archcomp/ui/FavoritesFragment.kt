@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.archcomp.MainApplication
 import com.example.archcomp.data.Favorite
 import com.example.archcomp.databinding.FragmentFavoritesBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class FavoritesFragment : Fragment() {
 
@@ -40,11 +43,10 @@ class FavoritesFragment : Fragment() {
         val favoritesView = binding.favoritesView
         favoritesView.adapter = favoritesAdapter
 
-        productsViewModel
-            .getAllFavorites()
-            .observe(viewLifecycleOwner) { itemList ->
-                favoritesAdapter.submitList(itemList)
-            }
+        viewLifecycleOwner.lifecycleScope.launch {
+            productsViewModel
+                .getAllFavorites().collectLatest { favoritesAdapter.submitData(it) }
+        }
 
         return root
     }

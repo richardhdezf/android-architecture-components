@@ -16,10 +16,9 @@
 
 package com.example.archcomp.data.local
 
-import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.example.archcomp.data.Favorite
-import com.example.archcomp.data.Product
 
 @Dao
 interface FavoritesDao {
@@ -30,5 +29,5 @@ interface FavoritesDao {
     suspend fun delete(item: Favorite)
 
     @Query("SELECT * FROM favorite_table ORDER BY title ASC")
-    fun getAll(): LiveData<List<Favorite>>
+    fun getAll(): PagingSource<Int, Favorite>
 }
